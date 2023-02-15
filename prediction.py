@@ -31,20 +31,24 @@ def clean_detections(detections):
     cleaned = []
     max_boxes = 10
     num_detections = min(detections['num_detections'], max_boxes)
+    detectLength = detections['num_detections']-1
 
-    for i in range(0, num_detections):
-        d = {
-            'box': {
-                'yMin': detections['detection_boxes'][i][0],
-                'xMin': detections['detection_boxes'][i][1],
-                'yMax': detections['detection_boxes'][i][2],
-                'xMax': detections['detection_boxes'][i][3]
-            },
-            'class': detections['detection_class_entities'][i].decode('utf-8'),
-            'label': detections['detection_class_entities'][i].decode('utf-8'),
-            'score': detections['detection_scores'][i],
-        }
-        cleaned.append(d)
+    for i in range(0, detectLength):
+        if (detections['detection_scores'][i] > 0.3):
+            d = {
+                'box': {
+                    'yMin': detections['detection_boxes'][i][0],
+                    'xMin': detections['detection_boxes'][i][1],
+                    'yMax': detections['detection_boxes'][i][2],
+                    'xMax': detections['detection_boxes'][i][3]
+                },
+                'class': detections['detection_class_entities'][i].decode('utf-8'),
+                'label': detections['detection_class_entities'][i].decode('utf-8'),
+                'score': detections['detection_scores'][i],
+            }
+            cleaned.append(d)
+            if (len(cleaned) >= num_detections): 
+                break; 
 
     return cleaned
 
