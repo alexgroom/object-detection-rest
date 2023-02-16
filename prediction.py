@@ -1,5 +1,6 @@
 import tensorflow as tf
 import base64
+import os
 
 model_dir = 'models/openimages_v4_ssd_mobilenet_v2_1'
 saved_model = tf.saved_model.load(model_dir)
@@ -28,13 +29,17 @@ def detect(img):
 
 
 def clean_detections(detections):
+    # allow the environment variable ACCURACY to modify the minimum percentage precision 
+    # of the match
+    accuracy = int(os.environ.get("ACCURACY", "25")) / 100
     cleaned = []
+    # take at most 10 boxes
     max_boxes = 10
     num_detections = min(detections['num_detections'], max_boxes)
     detectLength = detections['num_detections']-1
 
     for i in range(0, detectLength):
-        if (detections['detection_scores'][i] > 0.3):
+        if (detections['detection_scores'][i] > accuracy):
             d = {
                 'box': {
                     'yMin': detections['detection_boxes'][i][0],
